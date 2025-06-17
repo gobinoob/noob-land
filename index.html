@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVM Program Counter - Interactive Tutorial</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background-color: #0a0a23;
+            color: #f5f6f7;
+            line-height: 1.4;
+        }
+        
+        .header {
+            background-color: #0a0a23;
+            border-bottom: 1px solid #1b1b32;
+            padding: 1rem 0;
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .course-title {
+            color: #99c9ff;
+            font-size: 0.875rem;
+        }
+        
+        .twitter-link {
+            color: #99c9ff;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .twitter-link:hover {
+            color: #1da1f2;
+            transform: translateY(-1px);
+        }
+        
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .lesson-header {
+            margin-bottom: 2rem;
+        }
+        
+        .lesson-title {
+            font-size: 2rem;
+            font-weight: 400;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+        
+        .lesson-description {
+            color: #c5c6c7;
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+        }
+        
+        .challenge-container {
+            background-color: #1b1b32;
+            border-radius: 5px;
+            border: 1px solid #2f3349;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .challenge-header {
+            background-color: #2f3349;
+            padding: 1rem;
+            border-bottom: 1px solid #1b1b32;
+        }
+        
+        .challenge-title {
+            color: #fff;
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .challenge-subtitle {
+            color: #99c9ff;
+            font-size: 0.875rem;
+        }
+        
+        .canvas-section {
+            padding: 2rem;
+            background-color: #1b1b32;
+        }
+        
+        #canvas {
+            width: 100%;
+            height: 500px;
+            background-color: #0a0a23;
+            border-radius: 5px;
+            border: 1px solid #2f3349;
+        }
+        
+        .controls-section {
+            padding: 1rem 2rem 2rem;
+            background-color: #1b1b32;
+            border-top: 1px solid #2f3349;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            background-color: #3b82f6;
+            color: #fff;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        
+        .btn:hover {
+            background-color: #2563eb;
+            transform: translateY(-1px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background-color: #6b7280;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
+        
+        .btn-success {
+            background-color: #10b981;
+        }
+        
+        .btn-success:hover {
+            background-color: #059669;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .info-panel {
+            background-color: #1b1b32;
+            border: 1px solid #2f3349;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .info-panel-header {
+            background-color: #2f3349;
+            padding: 1rem;
+            border-bottom: 1px solid #1b1b32;
+        }
+        
+        .info-panel-title {
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .info-panel-content {
+            padding: 1rem;
+        }
+        
+        .state-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #2f3349;
+        }
+        
+        .state-item:last-child {
+            border-bottom: none;
+        }
+        
+        .state-label {
+            color: #c5c6c7;
+            font-size: 0.875rem;
+        }
+        
+        .state-value {
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            background-color: #0a0a23;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+        }
+        
+        .bytecode-display {
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            background-color: #0a0a23;
+            padding: 1rem;
+            border-radius: 5px;
+            border: 1px solid #2f3349;
+            margin: 1rem 0;
+        }
+        
+        .bytecode-line {
+            margin-bottom: 0.5rem;
+        }
+        
+        .instruction-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .instruction-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #2f3349;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+        }
+        
+        .instruction-item:last-child {
+            border-bottom: none;
+        }
+        
+        .instruction-name {
+            font-family: 'Courier New', monospace;
+            color: #fff;
+            font-weight: 600;
+        }
+        
+        .instruction-desc {
+            color: #c5c6c7;
+            font-size: 0.8rem;
+        }
+        
+        .progress-bar {
+            background-color: #2f3349;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .progress-fill {
+            background-color: #10b981;
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+        
+        .highlight {
+            background-color: #3b82f6;
+            color: #fff;
+            padding: 0.125rem 0.25rem;
+            border-radius: 3px;
+        }
+        
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .controls {
+                justify-content: center;
+            }
+            
+            .canvas-section {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <div class="logo">🌱noob.land</div>
+            </div>
+            <a href="https://x.com/gobin00b" target="_blank" class="twitter-link">
+                @gobin00b
+            </a>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="lesson-header">
+            <h1 class="lesson-title">Understanding the EVM Program Counter</h1>
+            <p class="lesson-description">
+                Learn how the Program Counter (PC) controls execution flow in the Ethereum Virtual Machine through interactive visualization.
+            </p>
+        </div>
+
+        <div class="challenge-container">
+            <div class="challenge-header">
+                <h2 class="challenge-title">Interactive EVM Execution</h2>
+                <p class="challenge-subtitle">Watch how the Program Counter moves through bytecode step by step</p>
+            </div>
+            
+            <div class="canvas-section">
+                <canvas id="canvas"></canvas>
+            </div>
+            
+            <div class="controls-section">
+                <div class="controls">
+                    <button class="btn btn-success" onclick="startAnimation()">
+                        ▶️ Run Program
+                    </button>
+                    <button class="btn" onclick="stepForward()">
+                        ⏭️ Step Forward
+                    </button>
+                    <button class="btn btn-secondary" onclick="togglePause()">
+                        ⏸️ Pause
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetAnimation()">
+                        🔄 Reset
+                    </button>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-panel">
+                <div class="info-panel-header">
+                    <h3 class="info-panel-title">📊 Execution State</h3>
+                </div>
+                <div class="info-panel-content">
+                    <div class="state-item">
+                        <span class="state-label">Program Counter:</span>
+                        <span class="state-value" id="pc-value">0</span>
+                    </div>
+                    <div class="state-item">
+                        <span class="state-label">Current Instruction:</span>
+                        <span class="state-value" id="current-instruction">PUSH1</span>
+                    </div>
+                    <div class="state-item">
+                        <span class="state-label">Stack Contents:</span>
+                        <span class="state-value" id="stack-value">[]</span>
+                    </div>
+                    <div class="state-item">
+                        <span class="state-label">Execution Status:</span>
+                        <span class="state-value" id="status-value">Ready</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <div class="info-panel-header">
+                    <h3 class="info-panel-title">💾 Bytecode</h3>
+                </div>
+                <div class="info-panel-content">
+                    <div class="bytecode-display">
+                        <div class="bytecode-line">
+                            <strong>0x6003600501600760020200</strong>
+                        </div>
+                        <div style="color: #c5c6c7; font-size: 0.8rem; margin-top: 0.5rem;">
+                            PUSH1 3, PUSH1 5, ADD, PUSH1 7, PUSH1 2, MUL, STOP
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-panel" style="margin-top: 2rem;">
+            <div class="info-panel-header">
+                <h3 class="info-panel-title">📚 EVM Instructions Reference</h3>
+            </div>
+            <div class="info-panel-content">
+                <ul class="instruction-list">
+                    <li class="instruction-item">
+                        <div>
+                            <span class="instruction-name">PUSH1 n</span>
+                            <div class="instruction-desc">Push 1-byte value onto stack</div>
+                        </div>
+                        <span style="color: #10b981;">PC += 2</span>
+                    </li>
+                    <li class="instruction-item">
+                        <div>
+                            <span class="instruction-name">ADD</span>
+                            <div class="instruction-desc">Pop two values, push sum</div>
+                        </div>
+                        <span style="color: #10b981;">PC += 1</span>
+                    </li>
+                    <li class="instruction-item">
+                        <div>
+                            <span class="instruction-name">MUL</span>
+                            <div class="instruction-desc">Pop two values, push product</div>
+                        </div>
+                        <span style="color: #10b981;">PC += 1</span>
+                    </li>
+                    <li class="instruction-item">
+                        <div>
+                            <span class="instruction-name">STOP</span>
+                            <div class="instruction-desc">Halt program execution</div>
+                        </div>
+                        <span style="color: #10b981;">PC += 1</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Animation state
+        let animationState = {
+            pc: 0,
+            stack: [],
+            bytecode: [0x60, 0x03, 0x60, 0x05, 0x01, 0x60, 0x07, 0x60, 0x02, 0x02, 0x00],
+            instructions: ['PUSH1', '3', 'PUSH1', '5', 'ADD', 'PUSH1', '7', 'PUSH1', '2', 'MUL', 'STOP'],
+            currentStep: 0,
+            isRunning: false,
+            isPaused: false,
+            totalSteps: 6
+        };
+
+        // Canvas setup
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            canvas.style.width = rect.width + 'px';
+            canvas.style.height = rect.height + 'px';
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Drawing functions
+        function drawBytecode() {
+            const canvasRect = canvas.getBoundingClientRect();
+            const startX = 20;
+            const startY = 80;
+            const cellWidth = Math.min(80, (canvasRect.width - 40) / animationState.bytecode.length);
+            const cellHeight = 60;
+            
+            ctx.font = '12px Lato';
+            ctx.textAlign = 'center';
+            
+            // Title
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 16px Lato';
+            ctx.fillText('Bytecode Execution', canvasRect.width / 2, 30);
+            ctx.font = '12px Lato';
+            
+            // Draw bytecode cells
+            animationState.bytecode.forEach((byte, index) => {
+                const x = startX + index * (cellWidth + 5);
+                const y = startY;
+                
+                // Highlight current PC position
+                if (index === animationState.pc) {
+                    ctx.fillStyle = '#3b82f6';
+                    ctx.shadowColor = '#3b82f6';
+                    ctx.shadowBlur = 10;
+                } else {
+                    ctx.fillStyle = '#2f3349';
+                    ctx.shadowBlur = 0;
+                }
+                
+                // Draw cell with rounded corners
+                ctx.beginPath();
+                roundRect(ctx, x, y, cellWidth, cellHeight, 5);
+                ctx.fill();
+                
+                // Draw byte value
+                ctx.fillStyle = index === animationState.pc ? '#fff' : '#c5c6c7';
+                ctx.font = 'bold 14px Courier New';
+                ctx.fillText(`${byte.toString(16).padStart(2, '0').toUpperCase()}`, x + cellWidth/2, y + 25);
+                
+                // Draw instruction name
+                ctx.font = '10px Lato';
+                ctx.fillText(animationState.instructions[index], x + cellWidth/2, y + 45);
+                
+                // Draw index
+                ctx.fillStyle = '#99c9ff';
+                ctx.font = '10px Lato';
+                ctx.fillText(index.toString(), x + cellWidth/2, y - 5);
+            });
+            
+            ctx.shadowBlur = 0;
+        }
+
+        function drawProgramCounter() {
+            const canvasRect = canvas.getBoundingClientRect();
+            const startX = 20;
+            const startY = 80;
+            const cellWidth = Math.min(80, (canvasRect.width - 40) / animationState.bytecode.length);
+            const cellHeight = 60;
+            
+            const pcX = startX + animationState.pc * (cellWidth + 5) + cellWidth/2;
+            const pcY = startY + cellHeight + 15;
+            
+            // Draw PC arrow
+            ctx.fillStyle = '#10b981';
+            ctx.beginPath();
+            ctx.moveTo(pcX, pcY);
+            ctx.lineTo(pcX - 8, pcY + 15);
+            ctx.lineTo(pcX + 8, pcY + 15);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Draw PC label
+            ctx.fillStyle = '#10b981';
+            ctx.font = 'bold 14px Lato';
+            ctx.textAlign = 'center';
+            ctx.fillText(`PC: ${animationState.pc}`, pcX, pcY + 35);
+        }
+
+        function drawStack() {
+            const canvasRect = canvas.getBoundingClientRect();
+            const stackX = canvasRect.width - 120;
+            const stackY = 80;
+            const stackWidth = 100;
+            const stackHeight = 35;
+            
+            ctx.font = '12px Lato';
+            ctx.textAlign = 'center';
+            
+            // Draw stack title
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 14px Lato';
+            ctx.fillText('Stack', stackX + stackWidth/2, 70);
+            ctx.font = '12px Lato';
+            
+            // Draw stack border
+            ctx.strokeStyle = '#2f3349';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(stackX, stackY, stackWidth, Math.max(200, animationState.stack.length * (stackHeight + 2) + 20));
+            
+            // Draw stack items (top to bottom)
+            animationState.stack.forEach((value, index) => {
+                const y = stackY + 10 + index * (stackHeight + 2);
+                
+                ctx.fillStyle = index === 0 ? '#3b82f6' : '#2f3349';
+                ctx.beginPath();
+                roundRect(ctx, stackX + 5, y, stackWidth - 10, stackHeight, 3);
+                ctx.fill();
+                
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 12px Courier New';
+                ctx.fillText(value.toString(), stackX + stackWidth/2, y + 22);
+            });
+            
+            // Draw empty stack indicator
+            if (animationState.stack.length === 0) {
+                ctx.fillStyle = '#6b7280';
+                ctx.font = '12px Lato';
+                ctx.fillText('(empty)', stackX + stackWidth/2, stackY + 30);
+            }
+        }
+
+        function drawExecutionInfo() {
+            const canvasRect = canvas.getBoundingClientRect();
+            const infoY = 250;
+            
+            ctx.font = 'bold 16px Lato';
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'left';
+            ctx.fillText('Current Execution Step:', 20, infoY);
+            
+            ctx.font = '14px Lato';
+            ctx.fillStyle = '#c5c6c7';
+            
+            if (animationState.pc < animationState.bytecode.length) {
+                const currentInstruction = animationState.instructions[animationState.pc];
+                
+                ctx.fillText(`🔍 Fetch: Read byte at position ${animationState.pc}`, 20, infoY + 30);
+                ctx.fillText(`📝 Decode: ${currentInstruction} instruction`, 20, infoY + 50);
+                ctx.fillText(`⚡ Execute: ${getInstructionDescription(currentInstruction)}`, 20, infoY + 70);
+                
+                // Next PC calculation
+                const nextPC = getNextPC();
+                if (nextPC !== animationState.pc) {
+                    ctx.fillText(`🎯 Update PC: ${animationState.pc} → ${nextPC}`, 20, infoY + 90);
+                }
+            } else {
+                ctx.fillStyle = '#10b981';
+                ctx.font = 'bold 16px Lato';
+                ctx.fillText('✅ Program execution completed!', 20, infoY + 30);
+            }
+        }
+
+        function getInstructionDescription(instruction) {
+            switch(instruction) {
+                case 'PUSH1': return 'Push next byte onto stack';
+                case 'ADD': return 'Pop two values, push their sum';
+                case 'MUL': return 'Pop two values, push their product';
+                case 'STOP': return 'Halt program execution';
+                default: return instruction;
+            }
+        }
+
+        function getNextPC() {
+            if (animationState.pc >= animationState.bytecode.length) return animationState.pc;
+            
+            const currentInstruction = animationState.instructions[animationState.pc];
+            if (currentInstruction === 'PUSH1') {
+                return animationState.pc + 2; // Skip the data byte
+            }
+            return animationState.pc + 1;
+        }
+
+        function draw() {
+            // Clear canvas with background
+            const canvasRect = canvas.getBoundingClientRect();
+            ctx.fillStyle = '#0a0a23';
+            ctx.fillRect(0, 0, canvasRect.width, canvasRect.height);
+            
+            // Draw components
+            drawBytecode();
+            drawProgramCounter();
+            drawStack();
+            drawExecutionInfo();
+            
+            // Update UI
+            updateStateDisplay();
+        }
+
+        function updateStateDisplay() {
+            document.getElementById('pc-value').textContent = animationState.pc;
+            
+            if (animationState.pc < animationState.instructions.length) {
+                document.getElementById('current-instruction').textContent = animationState.instructions[animationState.pc];
+                document.getElementById('status-value').textContent = animationState.isRunning ? 'Running' : 'Paused';
+            } else {
+                document.getElementById('current-instruction').textContent = 'FINISHED';
+                document.getElementById('status-value').textContent = 'Completed';
+            }
+            
+            document.getElementById('stack-value').textContent = `[${animationState.stack.join(', ')}]`;
+            
+            // Update progress bar
+            const progress = Math.min(100, (animationState.currentStep / animationState.totalSteps) * 100);
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+        }
+
+        function executeInstruction() {
+            if (animationState.pc >= animationState.bytecode.length) {
+                animationState.isRunning = false;
+                return;
+            }
+            
+            const instruction = animationState.instructions[animationState.pc];
+            
+            switch(instruction) {
+                case 'PUSH1':
+                    const value = animationState.bytecode[animationState.pc + 1];
+                    animationState.stack.unshift(value);
+                    animationState.pc += 2;
+                    animationState.currentStep++;
+                    break;
+                case 'ADD':
+                    if (animationState.stack.length >= 2) {
+                        const b = animationState.stack.shift();
+                        const a = animationState.stack.shift();
+                        animationState.stack.unshift(a + b);
+                    }
+                    animationState.pc += 1;
+                    animationState.currentStep++;
+                    break;
+                case 'MUL':
+                    if (animationState.stack.length >= 2) {
+                        const b = animationState.stack.shift();
+                        const a = animationState.stack.shift();
+                        animationState.stack.unshift(a * b);
+                    }
+                    animationState.pc += 1;
+                    animationState.currentStep++;
+                    break;
+                case 'STOP':
+                    animationState.pc += 1;
+                    animationState.isRunning = false;
+                    animationState.currentStep++;
+                    break;
+                default:
+                    animationState.pc += 1;
+                    break;
+            }
+        }
+
+        function animationLoop() {
+            draw();
+            
+            if (animationState.isRunning && !animationState.isPaused) {
+                setTimeout(() => {
+                    executeInstruction();
+                    if (animationState.isRunning) {
+                        requestAnimationFrame(animationLoop);
+                    }
+                }, 2000); // 2 second delay between steps
+            } else if (animationState.isRunning && animationState.isPaused) {
+                requestAnimationFrame(animationLoop);
+            }
+        }
+
+        // Control functions
+        function startAnimation() {
+            animationState.isRunning = true;
+            animationState.isPaused = false;
+            animationLoop();
+        }
+
+        function resetAnimation() {
+            animationState.pc = 0;
+            animationState.stack = [];
+            animationState.currentStep = 0;
+            animationState.isRunning = false;
+            animationState.isPaused = false;
+            draw();
+        }
+
+        function stepForward() {
+            executeInstruction();
+            draw();
+        }
+
+        function togglePause() {
+            animationState.isPaused = !animationState.isPaused;
+            if (!animationState.isPaused && animationState.isRunning) {
+                animationLoop();
+            }
+        }
+
+        // Helper function for rounded rectangles
+        function roundRect(ctx, x, y, w, h, r) {
+            // Ensure radius is not negative and not larger than half the width/height
+            r = Math.max(0, Math.min(r, w / 2, h / 2));
+            
+            ctx.beginPath();
+            if (r === 0) {
+                // If radius is 0, just draw a regular rectangle
+                ctx.rect(x, y, w, h);
+            } else {
+                ctx.moveTo(x + r, y);
+                ctx.arcTo(x + w, y, x + w, y + h, r);
+                ctx.arcTo(x + w, y + h, x, y + h, r);
+                ctx.arcTo(x, y + h, x, y, r);
+                ctx.arcTo(x, y, x + w, y, r);
+            }
+            ctx.closePath();
+            return ctx;
+        }
+
+        // Initial draw
+        draw();
+    </script>
+</body>
+</html>
