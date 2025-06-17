@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EVM Program Counter - Interactive Tutorial</title>
+    <title>SHA256 Algorithm - Interactive Tutorial</title>
     <style>
         * {
             margin: 0;
@@ -44,11 +44,6 @@
             font-size: 1.5rem;
             font-weight: 600;
             color: #fff;
-        }
-        
-        .course-title {
-            color: #99c9ff;
-            font-size: 0.875rem;
         }
         
         .twitter-link {
@@ -121,7 +116,7 @@
         
         #canvas {
             width: 100%;
-            height: 500px;
+            height: 600px;
             background-color: #0a0a23;
             border-radius: 5px;
             border: 1px solid #2f3349;
@@ -131,6 +126,32 @@
             padding: 1rem 2rem 2rem;
             background-color: #1b1b32;
             border-top: 1px solid #2f3349;
+        }
+        
+        .input-section {
+            margin-bottom: 1rem;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .input-field {
+            flex: 1;
+            background-color: #0a0a23;
+            border: 1px solid #2f3349;
+            color: #fff;
+            padding: 0.75rem;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
         }
         
         .controls {
@@ -232,9 +253,11 @@
             background-color: #0a0a23;
             padding: 0.25rem 0.5rem;
             border-radius: 3px;
+            word-break: break-all;
+            max-width: 200px;
         }
         
-        .bytecode-display {
+        .hash-display {
             font-family: 'Courier New', monospace;
             font-size: 0.875rem;
             background-color: #0a0a23;
@@ -242,39 +265,7 @@
             border-radius: 5px;
             border: 1px solid #2f3349;
             margin: 1rem 0;
-        }
-        
-        .bytecode-line {
-            margin-bottom: 0.5rem;
-        }
-        
-        .instruction-list {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .instruction-item {
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #2f3349;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.875rem;
-        }
-        
-        .instruction-item:last-child {
-            border-bottom: none;
-        }
-        
-        .instruction-name {
-            font-family: 'Courier New', monospace;
-            color: #fff;
-            font-weight: 600;
-        }
-        
-        .instruction-desc {
-            color: #c5c6c7;
-            font-size: 0.8rem;
+            word-break: break-all;
         }
         
         .progress-bar {
@@ -292,10 +283,33 @@
             border-radius: 4px;
         }
         
-        .highlight {
-            background-color: #3b82f6;
+        .step-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #2f3349;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+        }
+        
+        .step-item:last-child {
+            border-bottom: none;
+        }
+        
+        .step-name {
+            font-family: 'Courier New', monospace;
             color: #fff;
-            padding: 0.125rem 0.25rem;
+            font-weight: 600;
+        }
+        
+        .step-desc {
+            color: #c5c6c7;
+            font-size: 0.8rem;
+        }
+        
+        .active-step {
+            background-color: #2f3349;
+            padding: 0.5rem;
             border-radius: 3px;
         }
         
@@ -311,6 +325,10 @@
             
             .canvas-section {
                 padding: 1rem;
+            }
+            
+            .input-group {
+                flex-direction: column;
             }
         }
     </style>
@@ -329,16 +347,16 @@
 
     <div class="main-container">
         <div class="lesson-header">
-            <h1 class="lesson-title">EVM Program Counter</h1>
+            <h1 class="lesson-title">Understanding SHA256 Hashing Algorithm</h1>
             <p class="lesson-description">
-                Program counter controls execution flow in the Ethereum Virtual Machine.
+                Learn how the SHA256 cryptographic hash function processes data through interactive visualization of the algorithm steps.
             </p>
         </div>
 
         <div class="challenge-container">
             <div class="challenge-header">
-                <h2 class="challenge-title">Interactive EVM Execution</h2>
-                <p class="challenge-subtitle">Watch how the Program Counter moves through bytecode step by step</p>
+                <h2 class="challenge-title">Interactive SHA256 Hasher</h2>
+                <p class="challenge-subtitle">Watch how SHA256 transforms your input through each algorithmic step</p>
             </div>
             
             <div class="canvas-section">
@@ -346,17 +364,29 @@
             </div>
             
             <div class="controls-section">
+                <div class="input-section">
+                    <div class="input-group">
+                        <input 
+                            type="text" 
+                            id="input-text" 
+                            class="input-field" 
+                            placeholder="Enter text to hash (e.g., 'Hello World')"
+                            value="Hello World"
+                        />
+                        <button class="btn btn-success" onclick="startHashing()">
+                            🔒 Hash Input
+                        </button>
+                    </div>
+                </div>
+                
                 <div class="controls">
-                    <button class="btn btn-success" onclick="startAnimation()">
-                        ▶️ Run Program
-                    </button>
                     <button class="btn" onclick="stepForward()">
-                        ⏭️ Step Forward
+                        ⏭️ Next Step
                     </button>
                     <button class="btn btn-secondary" onclick="togglePause()">
                         ⏸️ Pause
                     </button>
-                    <button class="btn btn-secondary" onclick="resetAnimation()">
+                    <button class="btn btn-secondary" onclick="resetHashing()">
                         🔄 Reset
                     </button>
                 </div>
@@ -370,23 +400,23 @@
         <div class="info-grid">
             <div class="info-panel">
                 <div class="info-panel-header">
-                    <h3 class="info-panel-title">📊 Execution State</h3>
+                    <h3 class="info-panel-title">📊 Hashing State</h3>
                 </div>
                 <div class="info-panel-content">
                     <div class="state-item">
-                        <span class="state-label">Program Counter:</span>
-                        <span class="state-value" id="pc-value">0</span>
+                        <span class="state-label">Current Step:</span>
+                        <span class="state-value" id="current-step">Ready</span>
                     </div>
                     <div class="state-item">
-                        <span class="state-label">Current Instruction:</span>
-                        <span class="state-value" id="current-instruction">PUSH1</span>
+                        <span class="state-label">Block Being Processed:</span>
+                        <span class="state-value" id="current-block">0</span>
                     </div>
                     <div class="state-item">
-                        <span class="state-label">Stack Contents:</span>
-                        <span class="state-value" id="stack-value">[]</span>
+                        <span class="state-label">Round:</span>
+                        <span class="state-value" id="current-round">0</span>
                     </div>
                     <div class="state-item">
-                        <span class="state-label">Execution Status:</span>
+                        <span class="state-label">Status:</span>
                         <span class="state-value" id="status-value">Ready</span>
                     </div>
                 </div>
@@ -394,15 +424,23 @@
 
             <div class="info-panel">
                 <div class="info-panel-header">
-                    <h3 class="info-panel-title">💾 Bytecode</h3>
+                    <h3 class="info-panel-title">🔐 Hash Output</h3>
                 </div>
                 <div class="info-panel-content">
-                    <div class="bytecode-display">
-                        <div class="bytecode-line">
-                            <strong>0x6003600501600760020200</strong>
+                    <div class="hash-display">
+                        <div style="color: #c5c6c7; font-size: 0.8rem; margin-bottom: 0.5rem;">
+                            SHA256 Hash (256-bit / 64 hex characters):
                         </div>
-                        <div style="color: #c5c6c7; font-size: 0.8rem; margin-top: 0.5rem;">
-                            PUSH1 3, PUSH1 5, ADD, PUSH1 7, PUSH1 2, MUL, STOP
+                        <div id="hash-output" style="color: #10b981; font-weight: bold;">
+                            Waiting for input...
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <div style="color: #c5c6c7; font-size: 0.8rem; margin-bottom: 0.5rem;">
+                            Input (UTF-8 bytes):
+                        </div>
+                        <div id="input-bytes" style="color: #99c9ff; font-family: 'Courier New', monospace; font-size: 0.75rem;">
+                            Waiting for input...
                         </div>
                     </div>
                 </div>
@@ -411,54 +449,79 @@
 
         <div class="info-panel" style="margin-top: 2rem;">
             <div class="info-panel-header">
-                <h3 class="info-panel-title">📚 EVM Instructions Reference</h3>
+                <h3 class="info-panel-title">📚 SHA256 Algorithm Steps</h3>
             </div>
             <div class="info-panel-content">
-                <ul class="instruction-list">
-                    <li class="instruction-item">
+                <div id="steps-list">
+                    <div class="step-item">
                         <div>
-                            <span class="instruction-name">PUSH1 n</span>
-                            <div class="instruction-desc">Push 1-byte value onto stack</div>
+                            <span class="step-name">1. Preprocessing</span>
+                            <div class="step-desc">Convert input to binary and add padding</div>
                         </div>
-                        <span style="color: #10b981;">PC += 2</span>
-                    </li>
-                    <li class="instruction-item">
+                        <span style="color: #10b981;">512-bit blocks</span>
+                    </div>
+                    <div class="step-item">
                         <div>
-                            <span class="instruction-name">ADD</span>
-                            <div class="instruction-desc">Pop two values, push sum</div>
+                            <span class="step-name">2. Initialize Hash Values</span>
+                            <div class="step-desc">Set initial hash values (8 × 32-bit words)</div>
                         </div>
-                        <span style="color: #10b981;">PC += 1</span>
-                    </li>
-                    <li class="instruction-item">
+                        <span style="color: #10b981;">H₀-H₇</span>
+                    </div>
+                    <div class="step-item">
                         <div>
-                            <span class="instruction-name">MUL</span>
-                            <div class="instruction-desc">Pop two values, push product</div>
+                            <span class="step-name">3. Message Schedule</span>
+                            <div class="step-desc">Expand 16 words to 64 words</div>
                         </div>
-                        <span style="color: #10b981;">PC += 1</span>
-                    </li>
-                    <li class="instruction-item">
+                        <span style="color: #10b981;">W₀-W₆₃</span>
+                    </div>
+                    <div class="step-item">
                         <div>
-                            <span class="instruction-name">STOP</span>
-                            <div class="instruction-desc">Halt program execution</div>
+                            <span class="step-name">4. Compression Function</span>
+                            <div class="step-desc">64 rounds of mixing and transformation</div>
                         </div>
-                        <span style="color: #10b981;">PC += 1</span>
-                    </li>
-                </ul>
+                        <span style="color: #10b981;">a,b,c,d,e,f,g,h</span>
+                    </div>
+                    <div class="step-item">
+                        <div>
+                            <span class="step-name">5. Final Hash</span>
+                            <div class="step-desc">Combine with initial hash values</div>
+                        </div>
+                        <span style="color: #10b981;">256-bit result</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+        // SHA256 constants
+        const K = [
+            0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+            0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+            0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+            0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+            0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+            0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+            0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+            0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+        ];
+
         // Animation state
-        let animationState = {
-            pc: 0,
-            stack: [],
-            bytecode: [0x60, 0x03, 0x60, 0x05, 0x01, 0x60, 0x07, 0x60, 0x02, 0x02, 0x00],
-            instructions: ['PUSH1', '3', 'PUSH1', '5', 'ADD', 'PUSH1', '7', 'PUSH1', '2', 'MUL', 'STOP'],
+        let hashingState = {
+            input: "Hello World",
             currentStep: 0,
+            currentBlock: 0,
+            currentRound: 0,
             isRunning: false,
             isPaused: false,
-            totalSteps: 6
+            totalSteps: 5,
+            hashValues: [
+                0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+                0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+            ],
+            workingVars: [0, 0, 0, 0, 0, 0, 0, 0],
+            messageSchedule: new Array(64).fill(0),
+            finalHash: ""
         };
 
         // Canvas setup
@@ -477,310 +540,11 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // Drawing functions
-        function drawBytecode() {
-            const canvasRect = canvas.getBoundingClientRect();
-            const startX = 20;
-            const startY = 80;
-            const cellWidth = Math.min(80, (canvasRect.width - 40) / animationState.bytecode.length);
-            const cellHeight = 60;
-            
-            ctx.font = '12px Lato';
-            ctx.textAlign = 'center';
-            
-            // Title
-            ctx.fillStyle = '#fff';
-            ctx.font = 'bold 16px Lato';
-            ctx.fillText('Bytecode Execution', canvasRect.width / 2, 30);
-            ctx.font = '12px Lato';
-            
-            // Draw bytecode cells
-            animationState.bytecode.forEach((byte, index) => {
-                const x = startX + index * (cellWidth + 5);
-                const y = startY;
-                
-                // Highlight current PC position
-                if (index === animationState.pc) {
-                    ctx.fillStyle = '#3b82f6';
-                    ctx.shadowColor = '#3b82f6';
-                    ctx.shadowBlur = 10;
-                } else {
-                    ctx.fillStyle = '#2f3349';
-                    ctx.shadowBlur = 0;
-                }
-                
-                // Draw cell with rounded corners
-                ctx.beginPath();
-                roundRect(ctx, x, y, cellWidth, cellHeight, 5);
-                ctx.fill();
-                
-                // Draw byte value
-                ctx.fillStyle = index === animationState.pc ? '#fff' : '#c5c6c7';
-                ctx.font = 'bold 14px Courier New';
-                ctx.fillText(`${byte.toString(16).padStart(2, '0').toUpperCase()}`, x + cellWidth/2, y + 25);
-                
-                // Draw instruction name
-                ctx.font = '10px Lato';
-                ctx.fillText(animationState.instructions[index], x + cellWidth/2, y + 45);
-                
-                // Draw index
-                ctx.fillStyle = '#99c9ff';
-                ctx.font = '10px Lato';
-                ctx.fillText(index.toString(), x + cellWidth/2, y - 5);
-            });
-            
-            ctx.shadowBlur = 0;
-        }
-
-        function drawProgramCounter() {
-            const canvasRect = canvas.getBoundingClientRect();
-            const startX = 20;
-            const startY = 80;
-            const cellWidth = Math.min(80, (canvasRect.width - 40) / animationState.bytecode.length);
-            const cellHeight = 60;
-            
-            const pcX = startX + animationState.pc * (cellWidth + 5) + cellWidth/2;
-            const pcY = startY + cellHeight + 15;
-            
-            // Draw PC arrow
-            ctx.fillStyle = '#10b981';
-            ctx.beginPath();
-            ctx.moveTo(pcX, pcY);
-            ctx.lineTo(pcX - 8, pcY + 15);
-            ctx.lineTo(pcX + 8, pcY + 15);
-            ctx.closePath();
-            ctx.fill();
-            
-            // Draw PC label
-            ctx.fillStyle = '#10b981';
-            ctx.font = 'bold 14px Lato';
-            ctx.textAlign = 'center';
-            ctx.fillText(`PC: ${animationState.pc}`, pcX, pcY + 35);
-        }
-
-        function drawStack() {
-            const canvasRect = canvas.getBoundingClientRect();
-            const stackX = canvasRect.width - 120;
-            const stackY = 80;
-            const stackWidth = 100;
-            const stackHeight = 35;
-            
-            ctx.font = '12px Lato';
-            ctx.textAlign = 'center';
-            
-            // Draw stack title
-            ctx.fillStyle = '#fff';
-            ctx.font = 'bold 14px Lato';
-            ctx.fillText('Stack', stackX + stackWidth/2, 70);
-            ctx.font = '12px Lato';
-            
-            // Draw stack border
-            ctx.strokeStyle = '#2f3349';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(stackX, stackY, stackWidth, Math.max(200, animationState.stack.length * (stackHeight + 2) + 20));
-            
-            // Draw stack items (top to bottom)
-            animationState.stack.forEach((value, index) => {
-                const y = stackY + 10 + index * (stackHeight + 2);
-                
-                ctx.fillStyle = index === 0 ? '#3b82f6' : '#2f3349';
-                ctx.beginPath();
-                roundRect(ctx, stackX + 5, y, stackWidth - 10, stackHeight, 3);
-                ctx.fill();
-                
-                ctx.fillStyle = '#fff';
-                ctx.font = 'bold 12px Courier New';
-                ctx.fillText(value.toString(), stackX + stackWidth/2, y + 22);
-            });
-            
-            // Draw empty stack indicator
-            if (animationState.stack.length === 0) {
-                ctx.fillStyle = '#6b7280';
-                ctx.font = '12px Lato';
-                ctx.fillText('(empty)', stackX + stackWidth/2, stackY + 30);
-            }
-        }
-
-        function drawExecutionInfo() {
-            const canvasRect = canvas.getBoundingClientRect();
-            const infoY = 250;
-            
-            ctx.font = 'bold 16px Lato';
-            ctx.fillStyle = '#fff';
-            ctx.textAlign = 'left';
-            ctx.fillText('Current Execution Step:', 20, infoY);
-            
-            ctx.font = '14px Lato';
-            ctx.fillStyle = '#c5c6c7';
-            
-            if (animationState.pc < animationState.bytecode.length) {
-                const currentInstruction = animationState.instructions[animationState.pc];
-                
-                ctx.fillText(`🔍 Fetch: Read byte at position ${animationState.pc}`, 20, infoY + 30);
-                ctx.fillText(`📝 Decode: ${currentInstruction} instruction`, 20, infoY + 50);
-                ctx.fillText(`⚡ Execute: ${getInstructionDescription(currentInstruction)}`, 20, infoY + 70);
-                
-                // Next PC calculation
-                const nextPC = getNextPC();
-                if (nextPC !== animationState.pc) {
-                    ctx.fillText(`🎯 Update PC: ${animationState.pc} → ${nextPC}`, 20, infoY + 90);
-                }
-            } else {
-                ctx.fillStyle = '#10b981';
-                ctx.font = 'bold 16px Lato';
-                ctx.fillText('✅ Program execution completed!', 20, infoY + 30);
-            }
-        }
-
-        function getInstructionDescription(instruction) {
-            switch(instruction) {
-                case 'PUSH1': return 'Push next byte onto stack';
-                case 'ADD': return 'Pop two values, push their sum';
-                case 'MUL': return 'Pop two values, push their product';
-                case 'STOP': return 'Halt program execution';
-                default: return instruction;
-            }
-        }
-
-        function getNextPC() {
-            if (animationState.pc >= animationState.bytecode.length) return animationState.pc;
-            
-            const currentInstruction = animationState.instructions[animationState.pc];
-            if (currentInstruction === 'PUSH1') {
-                return animationState.pc + 2; // Skip the data byte
-            }
-            return animationState.pc + 1;
-        }
-
-        function draw() {
-            // Clear canvas with background
-            const canvasRect = canvas.getBoundingClientRect();
-            ctx.fillStyle = '#0a0a23';
-            ctx.fillRect(0, 0, canvasRect.width, canvasRect.height);
-            
-            // Draw components
-            drawBytecode();
-            drawProgramCounter();
-            drawStack();
-            drawExecutionInfo();
-            
-            // Update UI
-            updateStateDisplay();
-        }
-
-        function updateStateDisplay() {
-            document.getElementById('pc-value').textContent = animationState.pc;
-            
-            if (animationState.pc < animationState.instructions.length) {
-                document.getElementById('current-instruction').textContent = animationState.instructions[animationState.pc];
-                document.getElementById('status-value').textContent = animationState.isRunning ? 'Running' : 'Paused';
-            } else {
-                document.getElementById('current-instruction').textContent = 'FINISHED';
-                document.getElementById('status-value').textContent = 'Completed';
-            }
-            
-            document.getElementById('stack-value').textContent = `[${animationState.stack.join(', ')}]`;
-            
-            // Update progress bar
-            const progress = Math.min(100, (animationState.currentStep / animationState.totalSteps) * 100);
-            document.getElementById('progress-fill').style.width = `${progress}%`;
-        }
-
-        function executeInstruction() {
-            if (animationState.pc >= animationState.bytecode.length) {
-                animationState.isRunning = false;
-                return;
-            }
-            
-            const instruction = animationState.instructions[animationState.pc];
-            
-            switch(instruction) {
-                case 'PUSH1':
-                    const value = animationState.bytecode[animationState.pc + 1];
-                    animationState.stack.unshift(value);
-                    animationState.pc += 2;
-                    animationState.currentStep++;
-                    break;
-                case 'ADD':
-                    if (animationState.stack.length >= 2) {
-                        const b = animationState.stack.shift();
-                        const a = animationState.stack.shift();
-                        animationState.stack.unshift(a + b);
-                    }
-                    animationState.pc += 1;
-                    animationState.currentStep++;
-                    break;
-                case 'MUL':
-                    if (animationState.stack.length >= 2) {
-                        const b = animationState.stack.shift();
-                        const a = animationState.stack.shift();
-                        animationState.stack.unshift(a * b);
-                    }
-                    animationState.pc += 1;
-                    animationState.currentStep++;
-                    break;
-                case 'STOP':
-                    animationState.pc += 1;
-                    animationState.isRunning = false;
-                    animationState.currentStep++;
-                    break;
-                default:
-                    animationState.pc += 1;
-                    break;
-            }
-        }
-
-        function animationLoop() {
-            draw();
-            
-            if (animationState.isRunning && !animationState.isPaused) {
-                setTimeout(() => {
-                    executeInstruction();
-                    if (animationState.isRunning) {
-                        requestAnimationFrame(animationLoop);
-                    }
-                }, 2000); // 2 second delay between steps
-            } else if (animationState.isRunning && animationState.isPaused) {
-                requestAnimationFrame(animationLoop);
-            }
-        }
-
-        // Control functions
-        function startAnimation() {
-            animationState.isRunning = true;
-            animationState.isPaused = false;
-            animationLoop();
-        }
-
-        function resetAnimation() {
-            animationState.pc = 0;
-            animationState.stack = [];
-            animationState.currentStep = 0;
-            animationState.isRunning = false;
-            animationState.isPaused = false;
-            draw();
-        }
-
-        function stepForward() {
-            executeInstruction();
-            draw();
-        }
-
-        function togglePause() {
-            animationState.isPaused = !animationState.isPaused;
-            if (!animationState.isPaused && animationState.isRunning) {
-                animationLoop();
-            }
-        }
-
         // Helper function for rounded rectangles
         function roundRect(ctx, x, y, w, h, r) {
-            // Ensure radius is not negative and not larger than half the width/height
             r = Math.max(0, Math.min(r, w / 2, h / 2));
-            
             ctx.beginPath();
             if (r === 0) {
-                // If radius is 0, just draw a regular rectangle
                 ctx.rect(x, y, w, h);
             } else {
                 ctx.moveTo(x + r, y);
@@ -791,6 +555,330 @@
             }
             ctx.closePath();
             return ctx;
+        }
+
+        // Drawing functions
+        function drawHashValues() {
+            const canvasRect = canvas.getBoundingClientRect();
+            const startX = 20;
+            const startY = 50;
+            const boxWidth = 120;
+            const boxHeight = 40;
+            
+            ctx.font = '12px Lato';
+            ctx.textAlign = 'center';
+            
+            // Title
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 16px Lato';
+            ctx.fillText('SHA256 Hash Values (H₀-H₇)', canvasRect.width / 2, 30);
+            ctx.font = '10px Lato';
+            
+            // Draw hash value boxes
+            for (let i = 0; i < 8; i++) {
+                const x = startX + (i % 4) * (boxWidth + 10);
+                const y = startY + Math.floor(i / 4) * (boxHeight + 10);
+                
+                // Highlight active hash value
+                if (hashingState.currentStep >= 2) {
+                    ctx.fillStyle = '#3b82f6';
+                    ctx.shadowColor = '#3b82f6';
+                    ctx.shadowBlur = 5;
+                } else {
+                    ctx.fillStyle = '#2f3349';
+                    ctx.shadowBlur = 0;
+                }
+                
+                roundRect(ctx, x, y, boxWidth, boxHeight, 5);
+                ctx.fill();
+                
+                // Draw hash value
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 10px Courier New';
+                ctx.fillText(`H${i}`, x + boxWidth/2, y + 15);
+                ctx.font = '8px Courier New';
+                ctx.fillText(hashingState.hashValues[i].toString(16).padStart(8, '0').toUpperCase(), x + boxWidth/2, y + 30);
+            }
+            
+            ctx.shadowBlur = 0;
+        }
+
+        function drawCompressionFunction() {
+            const canvasRect = canvas.getBoundingClientRect();
+            const startX = 20;
+            const startY = 200;
+            const boxWidth = 80;
+            const boxHeight = 35;
+            
+            ctx.font = '12px Lato';
+            ctx.textAlign = 'center';
+            
+            // Title
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 14px Lato';
+            ctx.fillText('Compression Function (Working Variables)', startX + 320, startY - 20);
+            ctx.font = '10px Lato';
+            
+            // Draw working variables (a, b, c, d, e, f, g, h)
+            const labels = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+            for (let i = 0; i < 8; i++) {
+                const x = startX + i * (boxWidth + 5);
+                const y = startY;
+                
+                // Highlight based on current step
+                if (hashingState.currentStep === 4 && hashingState.currentRound > 0) {
+                    ctx.fillStyle = i < 2 ? '#10b981' : '#2f3349';
+                } else {
+                    ctx.fillStyle = '#2f3349';
+                }
+                
+                roundRect(ctx, x, y, boxWidth, boxHeight, 3);
+                ctx.fill();
+                
+                // Draw variable label and value
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 12px Lato';
+                ctx.fillText(labels[i], x + boxWidth/2, y + 15);
+                ctx.font = '8px Courier New';
+                const value = hashingState.workingVars[i];
+                ctx.fillText(value.toString(16).padStart(8, '0').substring(0, 6) + '...', x + boxWidth/2, y + 28);
+            }
+        }
+
+        function drawMessageSchedule() {
+            const canvasRect = canvas.getBoundingClientRect();
+            const startX = 20;
+            const startY = 300;
+            const boxWidth = 60;
+            const boxHeight = 30;
+            
+            ctx.font = '12px Lato';
+            ctx.textAlign = 'center';
+            
+            // Title
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 14px Lato';
+            ctx.fillText('Message Schedule (W₀-W₆₃)', startX + 400, startY - 20);
+            ctx.font = '8px Lato';
+            
+            // Draw first 16 message schedule words
+            for (let i = 0; i < 16; i++) {
+                const x = startX + (i % 8) * (boxWidth + 5);
+                const y = startY + Math.floor(i / 8) * (boxHeight + 5);
+                
+                // Highlight current word
+                if (hashingState.currentStep >= 3 && i === hashingState.currentRound % 16) {
+                    ctx.fillStyle = '#ffd93d';
+                } else if (hashingState.currentStep >= 3) {
+                    ctx.fillStyle = '#3b82f6';
+                } else {
+                    ctx.fillStyle = '#2f3349';
+                }
+                
+                roundRect(ctx, x, y, boxWidth, boxHeight, 3);
+                ctx.fill();
+                
+                // Draw word value
+                ctx.fillStyle = hashingState.currentStep >= 3 ? '#000' : '#fff';
+                ctx.font = '8px Courier New';
+                ctx.fillText(`W${i}`, x + boxWidth/2, y + 12);
+                ctx.fillText(hashingState.messageSchedule[i].toString(16).substring(0, 4) + '...', x + boxWidth/2, y + 23);
+            }
+        }
+
+        function drawCurrentStep() {
+            const canvasRect = canvas.getBoundingClientRect();
+            const infoY = 450;
+            
+            ctx.font = 'bold 16px Lato';
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'left';
+            ctx.fillText('Current Processing Step:', 20, infoY);
+            
+            ctx.font = '14px Lato';
+            ctx.fillStyle = '#c5c6c7';
+            
+            const stepDescriptions = [
+                "Ready to begin SHA256 hashing process",
+                "🔄 Preprocessing: Converting input to binary and adding padding",
+                "⚙️ Initializing: Setting up initial hash values H₀-H₇",
+                "📝 Message Schedule: Expanding message words W₀-W₆₃",
+                "🔄 Compression: Running 64 rounds of hash transformation",
+                "✅ Finalization: Computing final 256-bit hash value"
+            ];
+            
+            const currentDesc = stepDescriptions[Math.min(hashingState.currentStep, stepDescriptions.length - 1)];
+            ctx.fillText(currentDesc, 20, infoY + 30);
+            
+            if (hashingState.currentStep === 4) {
+                ctx.fillText(`Round ${hashingState.currentRound + 1}/64`, 20, infoY + 50);
+            }
+        }
+
+        function draw() {
+            // Clear canvas with background
+            const canvasRect = canvas.getBoundingClientRect();
+            ctx.fillStyle = '#0a0a23';
+            ctx.fillRect(0, 0, canvasRect.width, canvasRect.height);
+            
+            // Draw components
+            drawHashValues();
+            drawCompressionFunction();
+            drawMessageSchedule();
+            drawCurrentStep();
+            
+            // Update UI
+            updateStateDisplay();
+        }
+
+        function updateStateDisplay() {
+            const stepNames = ["Ready", "Preprocessing", "Initialize", "Message Schedule", "Compression", "Finalization"];
+            document.getElementById('current-step').textContent = stepNames[hashingState.currentStep] || "Complete";
+            document.getElementById('current-block').textContent = hashingState.currentBlock;
+            document.getElementById('current-round').textContent = hashingState.currentRound;
+            document.getElementById('status-value').textContent = hashingState.isRunning ? 'Processing' : 'Ready';
+            
+            // Update progress bar
+            const progress = Math.min(100, (hashingState.currentStep / hashingState.totalSteps) * 100);
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+            
+            // Update hash output
+            if (hashingState.finalHash) {
+                document.getElementById('hash-output').textContent = hashingState.finalHash;
+            }
+            
+            // Update input bytes
+            const inputBytes = Array.from(new TextEncoder().encode(hashingState.input))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join(' ');
+            document.getElementById('input-bytes').textContent = inputBytes;
+            
+            // Highlight current step
+            const stepItems = document.querySelectorAll('.step-item');
+            stepItems.forEach((item, index) => {
+                if (index + 1 === hashingState.currentStep) {
+                    item.classList.add('active-step');
+                } else {
+                    item.classList.remove('active-step');
+                }
+            });
+        }
+
+        // Simple SHA256 implementation for demonstration
+        function simpleSHA256(message) {
+            // This is a simplified version for visualization
+            let hash = 0;
+            for (let i = 0; i < message.length; i++) {
+                const char = message.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32-bit integer
+            }
+            
+            // Simulate a more realistic hash
+            const simulated = Array.from(new TextEncoder().encode(message))
+                .reduce((acc, byte, i) => acc + byte * (i + 1) * 2654435761, 0);
+            
+            return Math.abs(simulated).toString(16).padStart(64, '0').substring(0, 64);
+        }
+
+        function executeStep() {
+            if (hashingState.currentStep >= hashingState.totalSteps) {
+                hashingState.isRunning = false;
+                return;
+            }
+            
+            switch (hashingState.currentStep) {
+                case 0: // Start
+                    hashingState.currentStep = 1;
+                    break;
+                case 1: // Preprocessing
+                    hashingState.currentStep = 2;
+                    break;
+                case 2: // Initialize hash values
+                    hashingState.currentStep = 3;
+                    // Initialize working variables with hash values
+                    hashingState.workingVars = [...hashingState.hashValues];
+                    break;
+                case 3: // Message schedule
+                    // Simulate message schedule generation
+                    for (let i = 0; i < 16; i++) {
+                        hashingState.messageSchedule[i] = Math.floor(Math.random() * 0xFFFFFFFF);
+                    }
+                    hashingState.currentStep = 4;
+                    break;
+                case 4: // Compression function
+                    hashingState.currentRound++;
+                    // Simulate working variable updates
+                    if (hashingState.currentRound < 64) {
+                        for (let i = 0; i < 8; i++) {
+                            hashingState.workingVars[i] = Math.floor(Math.random() * 0xFFFFFFFF);
+                        }
+                    } else {
+                        hashingState.currentStep = 5;
+                        // Generate final hash
+                        hashingState.finalHash = simpleSHA256(hashingState.input);
+                        hashingState.isRunning = false;
+                    }
+                    break;
+                default:
+                    hashingState.isRunning = false;
+                    break;
+            }
+        }
+
+        function animationLoop() {
+            draw();
+            
+            if (hashingState.isRunning && !hashingState.isPaused) {
+                setTimeout(() => {
+                    executeStep();
+                    if (hashingState.isRunning) {
+                        requestAnimationFrame(animationLoop);
+                    }
+                }, hashingState.currentStep === 4 ? 100 : 1500); // Faster during compression rounds
+            } else if (hashingState.isRunning && hashingState.isPaused) {
+                requestAnimationFrame(animationLoop);
+            }
+        }
+
+        // Control functions
+        function startHashing() {
+            const inputText = document.getElementById('input-text').value;
+            hashingState.input = inputText;
+            hashingState.isRunning = true;
+            hashingState.isPaused = false;
+            hashingState.currentStep = 0;
+            hashingState.currentRound = 0;
+            hashingState.finalHash = "";
+            animationLoop();
+        }
+
+        function resetHashing() {
+            hashingState.currentStep = 0;
+            hashingState.currentBlock = 0;
+            hashingState.currentRound = 0;
+            hashingState.isRunning = false;
+            hashingState.isPaused = false;
+            hashingState.hashValues = [
+                0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+                0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+            ];
+            hashingState.workingVars = [0, 0, 0, 0, 0, 0, 0, 0];
+            hashingState.messageSchedule = new Array(64).fill(0);
+            hashingState.finalHash = "";
+            draw();
+        }
+
+        function stepForward() {
+            executeStep();
+            draw();
+        }
+
+        function togglePause() {
+            hashingState.isPaused = !hashingState.isPaused;
+            if (!hashingState.isPaused && hashingState.isRunning) {
+                animationLoop();
+            }
         }
 
         // Initial draw
