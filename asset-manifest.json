@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/noob-land/static/css/main.e3d21d6f.css",
+    "main.js": "/noob-land/static/js/main.f899c03a.js",
+    "static/js/453.cacc0c96.chunk.js": "/noob-land/static/js/453.cacc0c96.chunk.js",
+    "index.html": "/noob-land/index.html",
+    "main.e3d21d6f.css.map": "/noob-land/static/css/main.e3d21d6f.css.map",
+    "main.f899c03a.js.map": "/noob-land/static/js/main.f899c03a.js.map",
+    "453.cacc0c96.chunk.js.map": "/noob-land/static/js/453.cacc0c96.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e3d21d6f.css",
+    "static/js/main.f899c03a.js"
+  ]
+}
