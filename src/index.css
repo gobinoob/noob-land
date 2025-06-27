@@ -1,13 +1,69 @@
+/* src/index.css */
+
+/* Apply a global reset and set up the default font */
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Roboto Mono', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: 'Roboto Mono', Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Import Tailwind CSS directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom CSS variables for Ayu Mirage theme */
+:root {
+  --ayu-bg-primary: #0F1219;
+  --ayu-bg-secondary: #171A21;
+  --ayu-bg-tertiary: #21242B;
+  --ayu-code-bg: #0F1219; /* Same as primary for consistency */
+
+  --ayu-fg: #CBCCC6;
+  --ayu-fg-muted: #8F939D;
+
+  --ayu-accent-orange: #FFCC66;
+  --ayu-accent-green: #95E6CB;
+  --ayu-accent-blue: #7FD9EA;
+  --ayu-accent-purple: #BD97EC;
+  --ayu-accent-red: #FF8F80;
+
+  --ayu-border: #2D3038;
+}
+
+/* Apply custom colors using utility classes */
+.bg-ayu-bg-primary { background-color: var(--ayu-bg-primary); }
+.bg-ayu-bg-secondary { background-color: var(--ayu-bg-secondary); }
+.bg-ayu-bg-tertiary { background-color: var(--ayu-bg-tertiary); }
+.bg-ayu-code-bg { background-color: var(--ayu-code-bg); }
+
+.text-ayu-fg { color: var(--ayu-fg); }
+.text-ayu-fg-muted { color: var(--ayu-fg-muted); }
+
+.text-ayu-accent-orange { color: var(--ayu-accent-orange); }
+.text-ayu-accent-green { color: var(--ayu-accent-green); }
+.text-ayu-accent-blue { color: var(--ayu-accent-blue); }
+.text-ayu-accent-purple { color: var(--ayu-accent-purple); }
+.text-ayu-accent-red { color: var(--ayu-accent-red); }
+
+.btn-primary { background-color: var(--ayu-accent-orange); color: var(--ayu-bg-secondary); }
+.btn-primary-hover { background-color: #E6B85E; } /* Slightly darker orange */
+
+.btn-secondary { background-color: var(--ayu-accent-green); color: var(--ayu-bg-secondary); }
+.btn-secondary-hover { background-color: #85D4BC; }
+
+.btn-danger { background-color: var(--ayu-accent-red); color: var(--ayu-bg-secondary); }
+.btn-danger-hover { background-color: #E67A6B; }
+
+.border-ayu-border { border-color: var(--ayu-border); }
+
+.bg-bluish-grey { background-color: #4A5568; }
+
+/* Global Font from Google Fonts for 'Inter' */
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700&display=swap');
