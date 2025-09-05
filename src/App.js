@@ -242,12 +242,12 @@ const App = () => {
         </h1>
         {/* Link to X profile in the top right corner */}
         <a
-          href="https://x.com/gobin00b"
+          href="https://x.com/gobinoob_"
           target="_blank"
           rel="noopener noreferrer"
           className="text-ayu-fg-muted text-xs sm:text-sm hover:text-ayu-fg transition-colors duration-200"
         >
-          @gobin00b
+          @gobinoob
         </a>
       </div>
 
